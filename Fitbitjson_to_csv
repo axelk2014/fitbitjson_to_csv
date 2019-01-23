@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+# create loop with heart_rate.jsons
+for f in heart_rate*; do echo "extracting "$f && cat $f | jq '.[] | [.dateTime, .value.bpm, .value.confidence] | @csv' >> tmp.csv; done
+
+
+# remove \ and " 
+cat tmp.csv | sed -e 's/\\//g' -e 's/"//g' > heart.csv
+
+
+# split files to 500k rows
+split -l 500000 heart.csv heartrate
+
+
+# iterate through heartrate split files and make them csvs.
+array=($(ls heartrate*))
+len=${#array[@]}
+for (( i=0; i< $len; i++ )); do mv "${array[$i]}" "${array[$i]:0:9}"$i".csv"; done 
+
+
+# add column headers
+for h in `ls heartrate*`; do sed -i '' '1s/^/date,bpm,confidence\'$'\n/' $h; done
