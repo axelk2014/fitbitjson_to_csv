@@ -21,3 +21,7 @@ for (( i=0; i< $len; i++ )); do mv "${array[$i]}" "${array[$i]:0:9}"$i".csv"; do
 
 # add column headers
 for h in `ls heartrate*`; do sed -i '' '1s/^/date,bpm,confidence\'$'\n/' $h; done
+
+
+# clean up
+rm -f tmp.csv
